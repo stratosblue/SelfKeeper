@@ -1,0 +1,27 @@
+﻿<Project>
+  <PropertyGroup>
+    <TargetFrameworks>net6.0</TargetFrameworks>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <Nullable>enable</Nullable>
+
+    <LangVersion>latest</LangVersion>
+  </PropertyGroup>
+
+  <!--Package Info-->
+  <PropertyGroup>
+    <VersionPrefix>1.0.0-beta-001</VersionPrefix>
+
+    <Description>A library that lets applications run as their own watchdog. 允许应用程序作为自己的看门狗运行的库。</Description>
+
+    <Authors>stratos</Authors>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/stratosblue/selfkeeper</PackageProjectUrl>
+
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
+
+    <PackageTags>watchdog;watch-dog</PackageTags>
+  </PropertyGroup>
+</Project>

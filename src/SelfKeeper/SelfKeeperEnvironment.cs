@@ -8,9 +8,14 @@ namespace SelfKeeper;
 public static class SelfKeeperEnvironment
 {
     /// <summary>
-    /// 子进程参数名称
+    /// 默认命令行参数名称 - 子进程选项
     /// </summary>
-    public const string KeepSelfChildProcessCommandArgumentName = "--Keep-Self";
+    public const string DefaultCommandArgumentNameChildProcessOptions = "--Keep-Self";
+
+    /// <summary>
+    /// 默认命令行参数名称 - 不启用 KeepSelf
+    /// </summary>
+    public const string DefaultCommandArgumentNameNoKeepSelf = "--No-Keep-Self";
 
     private static uint s_increaseSessionId;
     private static bool? s_isChildProcess;
@@ -35,12 +40,12 @@ public static class SelfKeeperEnvironment
     /// <summary>
     /// SessionId，当前为子进程时才会有具体的值
     /// </summary>
-    public static uint SessionId
+    public static uint? SessionId
     {
         get => s_isInitiated > 0
                  ? IsChildProcess
                      ? s_sessionId ?? throw new InvalidOperationException("SelfKeeper not initialization successful yet.")
-                     : throw new InvalidOperationException("Current process is not a child process.")
+                     : null
                  : throw new InvalidOperationException("SelfKeeper not initialization successful yet.");
         internal set => s_sessionId = value;
     }

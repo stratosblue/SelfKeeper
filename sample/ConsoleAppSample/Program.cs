@@ -10,6 +10,8 @@ KeepSelf.Handle(args, options =>
     options.StartFailRetryDelay = TimeSpan.FromSeconds(1);  //配置启动失败的重试延时
     options.RestartDelay = TimeSpan.FromSeconds(1); //进程退出后的重启延时
     //options.Logger = null;  //配置日志记录器
+    options.ChildProcessOptionsCommandArgumentName = "--child-process-options"; //自定义子进程选项的参数名
+    options.NoKeepSelfCommandArgumentName = "--no-keep-self"; //自定义不启用 KeepSelf 的参数名
 });
 
 Log($"SelfKeeperEnvironment IsChildProcess: {SelfKeeperEnvironment.IsChildProcess}, SessionId: {SelfKeeperEnvironment.SessionId}");

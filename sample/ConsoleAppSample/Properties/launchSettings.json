@@ -3,6 +3,10 @@
     "ConsoleAppSample": {
       "commandName": "Project"
     },
+    "ConsoleAppSample - NoKeepSelf": {
+      "commandName": "Project",
+      "commandLineArgs": "--no-keep-self"
+    },
     "WSL": {
       "commandName": "WSL2",
       "environmentVariables": {},

@@ -20,7 +20,7 @@ internal sealed class SelfKeeperService
 
         _logger = options.Logger;
 
-        _baseProcessStartInfo.ArgumentList.Add(SelfKeeperEnvironment.KeepSelfChildProcessCommandArgumentName);
+        _baseProcessStartInfo.ArgumentList.Add(options.ChildProcessOptionsCommandArgumentName);
         _baseProcessStartInfo.ArgumentList.Add("KeepSelfChildProcessOptionsValue"); //占位
     }
 

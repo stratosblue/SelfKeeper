@@ -25,6 +25,32 @@ public class KeepSelfHostOptions
     /// </summary>
     public TimeSpan StartFailRetryDelay { get; set; } = TimeSpan.FromSeconds(3);
 
+    #region CommandArgumentNames
+
+    private string _childProcessOptionsCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameChildProcessOptions;
+    private string _noKeepSelfCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameNoKeepSelf;
+
+    /// <summary>
+    /// 命令行参数名称 - 子进程选项 (默认: <see cref="SelfKeeperEnvironment.DefaultCommandArgumentNameChildProcessOptions"/>)
+    /// </summary>
+    public string ChildProcessOptionsCommandArgumentName { get => _childProcessOptionsCommandArgumentName; set => SetCommandArgumentName(ref _childProcessOptionsCommandArgumentName, value); }
+
+    /// <summary>
+    /// 命令行参数名称 - 不启用 KeepSelf (默认: <see cref="SelfKeeperEnvironment.DefaultCommandArgumentNameNoKeepSelf"/>)
+    /// </summary>
+    public string NoKeepSelfCommandArgumentName { get => _noKeepSelfCommandArgumentName; set => SetCommandArgumentName(ref _noKeepSelfCommandArgumentName, value); }
+
+    private static void SetCommandArgumentName(ref string target, string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            throw new ArgumentException($"“{nameof(value)}”不能为 null 或空白。", nameof(value));
+        }
+        target = value;
+    }
+
+    #endregion CommandArgumentNames
+
     /// <summary>
     /// 添加特性标识
     /// </summary>

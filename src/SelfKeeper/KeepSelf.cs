@@ -50,8 +50,9 @@ public static class KeepSelf
 
         hostOptions ??= new();
 
-        if (Debugger.IsAttached
-            && hostOptions.Features.Contains(KeepSelfFeatureFlag.SkipWhenDebuggerAttached))
+        if ((Debugger.IsAttached
+             && hostOptions.Features.Contains(KeepSelfFeatureFlag.SkipWhenDebuggerAttached))
+            || args.Any(m => string.Equals(hostOptions.NoKeepSelfCommandArgumentName, m, StringComparison.OrdinalIgnoreCase)))
         {
             SelfKeeperEnvironment.IsChildProcess = false;
 
@@ -59,14 +60,14 @@ public static class KeepSelf
             return false;
         }
 
-        var index = args.TakeWhile(m => !string.Equals(SelfKeeperEnvironment.KeepSelfChildProcessCommandArgumentName, m, StringComparison.Ordinal)).Count();
+        var index = args.TakeWhile(m => !string.Equals(hostOptions.ChildProcessOptionsCommandArgumentName, m, StringComparison.OrdinalIgnoreCase)).Count();
         if (index < args.Length - 1) //当前为子进程
         {
             var keepSelfOptionValue = args[index + 1];
 
             if (!KeepSelfChildProcessOptions.TryParseFromCommandLineArgumentValue(keepSelfOptionValue, out var options))
             {
-                throw new ArgumentException($"Incorrect value \"{keepSelfOptionValue}\" for \"{SelfKeeperEnvironment.KeepSelfChildProcessCommandArgumentName}\".");
+                throw new ArgumentException($"Incorrect value \"{keepSelfOptionValue}\" for \"{hostOptions.ChildProcessOptionsCommandArgumentName}\".");
             }
 
             SelfKeeperEnvironment.IsChildProcess = true;

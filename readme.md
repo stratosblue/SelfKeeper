@@ -10,15 +10,20 @@ A library that lets applications run as their own watchdog.
  - 支持部分信号传递到子进程，可以在某些情况下执行优雅关闭；
  - 原始的控制台输出颜色会被保留；
 
-## 1. 如何使用
+--------
 
-### 1.1 安装`Nuget`包
+### 工作原理
+通过命令行参数判断当前是否是子进程，如果不是，则复制当前进程的启动设置，添加相关命令行参数后启动子进程，并监控其运行状态。
+
+## 2. 如何使用
+
+### 2.1 安装`Nuget`包
 
 ```shell
 dotnet add package SelfKeeper --prerelease
 ```
 
-### 1.2 启用SelfKeeper
+### 2.2 启用SelfKeeper
 在程序入口处添加处理代码
 ```C#
 KeepSelf.Handle(args);
@@ -31,6 +36,8 @@ KeepSelf.Handle(args, options =>
     options.StartFailRetryDelay = TimeSpan.FromSeconds(1);  //配置启动失败的重试延时
     options.RestartDelay = TimeSpan.FromSeconds(1); //进程退出后的重启延时
     options.Logger = null;  //配置日志记录器
+    options.ChildProcessOptionsCommandArgumentName = "--child-process-options"; //自定义子进程选项的参数名
+    options.NoKeepSelfCommandArgumentName = "--no-keep-self"; //自定义不启用 KeepSelf 的参数名
 });
 ```
  - 主进程会在 `KeepSelf.Handle` 阻塞，启动并监控子进程；

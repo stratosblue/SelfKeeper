@@ -12,6 +12,7 @@ KeepSelf.Handle(args, options =>
     //options.Logger = null;  //配置日志记录器
     options.ChildProcessOptionsCommandArgumentName = "--child-process-options"; //自定义子进程选项的参数名
     options.NoKeepSelfCommandArgumentName = "--no-keep-self"; //自定义不启用 KeepSelf 的参数名
+    options.NoKeepSelfEnvironmentVariableName = "NoWatchDog"; //自定义不启用 KeepSelf 的环境变量名
 });
 
 Log($"SelfKeeperEnvironment IsChildProcess: {SelfKeeperEnvironment.IsChildProcess}, SessionId: {SelfKeeperEnvironment.SessionId}");

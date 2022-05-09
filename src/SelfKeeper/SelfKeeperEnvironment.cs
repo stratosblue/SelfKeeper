@@ -17,6 +17,11 @@ public static class SelfKeeperEnvironment
     /// </summary>
     public const string DefaultCommandArgumentNameNoKeepSelf = "--No-Keep-Self";
 
+    /// <summary>
+    /// 默认环境变量名称 - 不启用 KeepSelf
+    /// </summary>
+    public const string DefaultEnvironmentVariableNameNoKeepSelf = "NoKeepSelf";
+
     private static uint s_increaseSessionId;
     private static bool? s_isChildProcess;
     private static int s_isInitiated = 0;

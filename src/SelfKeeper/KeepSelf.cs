@@ -50,9 +50,7 @@ public static class KeepSelf
 
         hostOptions ??= new();
 
-        if ((Debugger.IsAttached
-             && hostOptions.Features.Contains(KeepSelfFeatureFlag.SkipWhenDebuggerAttached))
-            || args.Any(m => string.Equals(hostOptions.NoKeepSelfCommandArgumentName, m, StringComparison.OrdinalIgnoreCase)))
+        if (CheckIsNoKeepSelfOn(args, hostOptions))
         {
             SelfKeeperEnvironment.IsChildProcess = false;
 
@@ -99,6 +97,34 @@ public static class KeepSelf
     }
 
     #region Base
+
+    /// <summary>
+    /// 检查是否开启了 - NoKeepSelf
+    /// </summary>
+    /// <param name="args"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    private static bool CheckIsNoKeepSelfOn(string[] args, KeepSelfHostOptions options)
+    {
+        if (Debugger.IsAttached
+            && options.Features.Contains(KeepSelfFeatureFlag.SkipWhenDebuggerAttached))
+        {
+            options.Logger?.Debug("KeepSelf disabled by debugger attached.");
+            return true;
+        }
+        else if (args.Any(m => string.Equals(options.NoKeepSelfCommandArgumentName, m, StringComparison.OrdinalIgnoreCase)))
+        {
+            options.Logger?.Debug("KeepSelf disabled by command line argument.");
+            return true;
+        }
+        else if (EnvironmentUtil.IsSwitchOn(options.NoKeepSelfEnvironmentVariableName))
+        {
+            options.Logger?.Debug("KeepSelf disabled by environment variable.");
+            return true;
+        }
+
+        return false;
+    }
 
     private static void WaitParentProcessExit(int parentProcessId, ILogger? logger)
     {

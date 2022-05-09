@@ -25,6 +25,17 @@ public class KeepSelfHostOptions
     /// </summary>
     public TimeSpan StartFailRetryDelay { get; set; } = TimeSpan.FromSeconds(3);
 
+    #region EnvironmentVariableNames
+
+    private string _noKeepSelfEnvironmentVariableName = SelfKeeperEnvironment.DefaultEnvironmentVariableNameNoKeepSelf;
+
+    /// <summary>
+    /// 环境变量名称 - 不启用 KeepSelf (默认: <see cref="SelfKeeperEnvironment.DefaultEnvironmentVariableNameNoKeepSelf"/>)
+    /// </summary>
+    public string NoKeepSelfEnvironmentVariableName { get => _noKeepSelfEnvironmentVariableName; set => SetCommandArgumentName(ref _noKeepSelfEnvironmentVariableName, value); }
+
+    #endregion EnvironmentVariableNames
+
     #region CommandArgumentNames
 
     private string _childProcessOptionsCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameChildProcessOptions;

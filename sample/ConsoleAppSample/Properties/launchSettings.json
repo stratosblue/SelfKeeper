@@ -3,13 +3,20 @@
     "ConsoleAppSample": {
       "commandName": "Project"
     },
-    "ConsoleAppSample - NoKeepSelf": {
+    "ConsoleAppSample - NoKeepSelf@arg": {
       "commandName": "Project",
       "commandLineArgs": "--no-keep-self"
     },
     "WSL": {
       "commandName": "WSL2",
       "environmentVariables": {},
+      "distributionName": ""
+    },
+    "WSL - NoKeepSelf@env": {
+      "commandName": "WSL2",
+      "environmentVariables": {
+        "NoWatchDog": "true"
+      },
       "distributionName": ""
     }
   }

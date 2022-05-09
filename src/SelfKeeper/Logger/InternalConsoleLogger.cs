@@ -28,13 +28,13 @@ internal class InternalConsoleLogger : ISelfKeeperLogger
 
     private static string FormatMessage(string message, params object[] arg)
     {
-        if (!message.Contains('{'))
+        if (message.Contains('{'))
         {
-            return message;
+            int index = 0;
+            var messageTemplate = Regex.Replace(message, "{.+?}", match => $"{{{index++}}}");
+            message = string.Format(messageTemplate, arg);
         }
 
-        int index = 0;
-        var messageTemplate = Regex.Replace(message, "{.+?}", match => $"{{{index++}}}");
-        return $"[{Environment.ProcessId}] " + string.Format(messageTemplate, arg);
+        return $"[{Environment.ProcessId}] {message}";
     }
 }

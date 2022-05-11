@@ -1,10 +1,12 @@
 using SelfKeeper;
 
-Log($"Hello, World! ¡¾{Environment.OSVersion}¡¿");
+var logger = new DefaultConsoleLogger("WebApplicationSample");
+
+logger.Info($"Hello, World! ¡¾{Environment.OSVersion}¡¿");
 
 KeepSelf.Handle(args, options => options.RemoveFlag(KeepSelfFeatureFlag.SkipWhenDebuggerAttached | KeepSelfFeatureFlag.DisableForceKillByHost));
 
-Log($"SelfKeeperEnvironment IsChildProcess: {SelfKeeperEnvironment.IsChildProcess}, SessionId: {SelfKeeperEnvironment.SessionId}");
+logger.Info($"SelfKeeperEnvironment IsChildProcess: {SelfKeeperEnvironment.IsChildProcess}, SessionId: {SelfKeeperEnvironment.SessionId}");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,20 +44,6 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast");
 
 app.Run();
-
-static void Log(string message, ConsoleColor? color = null)
-{
-    if (color.HasValue)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"[{Environment.ProcessId}] {message}");
-        Console.ResetColor();
-    }
-    else
-    {
-        Console.WriteLine($"[{Environment.ProcessId}] {message}");
-    }
-}
 
 internal record WeatherForecast(DateTime Date, int TemperatureC, string? Summary)
 {

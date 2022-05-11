@@ -11,7 +11,7 @@
 
   <!--Package Info-->
   <PropertyGroup>
-    <VersionPrefix>1.0.0-beta-003</VersionPrefix>
+    <VersionPrefix>1.0.0-beta-004</VersionPrefix>
 
     <Description>A library that lets applications run as their own watchdog. 允许应用程序作为自己的看门狗运行的库。</Description>
 

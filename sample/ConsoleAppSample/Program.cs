@@ -2,7 +2,9 @@
 
 using SelfKeeper;
 
-Log($"Hello, World! 【{Environment.OSVersion}】");
+var logger = new DefaultConsoleLogger("ConsoleAppSample");
+
+logger.Info($"Hello, World! 【{Environment.OSVersion}】");
 
 KeepSelf.Handle(args, options =>
 {
@@ -15,56 +17,42 @@ KeepSelf.Handle(args, options =>
     options.NoKeepSelfEnvironmentVariableName = "NoWatchDog"; //自定义不启用 KeepSelf 的环境变量名
 });
 
-Log($"SelfKeeperEnvironment IsChildProcess: {SelfKeeperEnvironment.IsChildProcess}, SessionId: {SelfKeeperEnvironment.SessionId}");
+logger.Info($"SelfKeeperEnvironment IsChildProcess: {SelfKeeperEnvironment.IsChildProcess}, SessionId: {SelfKeeperEnvironment.SessionId}");
 
 Task.Run(() =>
 {
     Thread.Sleep(10_000);
-    Log($"SelfKeeperEnvironment.RequestKillCurrentProcess - {SelfKeeperEnvironment.RequestKillCurrentProcess()}");
+    logger.Info($"SelfKeeperEnvironment.RequestKillCurrentProcess - {SelfKeeperEnvironment.RequestKillCurrentProcess()}");
 });
 
 PosixSignalRegistration.Create(PosixSignal.SIGTERM, s =>
 {
-    Log($"SIGTERM {Environment.ProcessId} {s}", ConsoleColor.Red);
+    logger.Warn($"SIGTERM {Environment.ProcessId} {s}");
     Thread.Sleep(15_000);
 });
 
 PosixSignalRegistration.Create(PosixSignal.SIGQUIT, s =>
 {
-    Log($"SIGQUIT {Environment.ProcessId} {s}", ConsoleColor.Red);
+    logger.Warn($"SIGQUIT {Environment.ProcessId} {s}");
 });
 
 PosixSignalRegistration.Create(PosixSignal.SIGINT, s =>
 {
-    Log($"SIGINT {Environment.ProcessId} {s}", ConsoleColor.Red);
+    logger.Warn($"SIGINT {Environment.ProcessId} {s}");
     Thread.Sleep(15_000);
 });
 
 Console.CancelKeyPress += (s, e) =>
 {
-    Log($"CancelKeyPress {Environment.ProcessId} {e}", ConsoleColor.Red);
+    logger.Warn($"CancelKeyPress {Environment.ProcessId} {e}");
 };
 
 AppDomain.CurrentDomain.ProcessExit += (s, e) =>
 {
-    Log($"AppDomain.CurrentDomain.ProcessExit {Environment.ProcessId} {e}", ConsoleColor.Red);
+    logger.Warn($"AppDomain.CurrentDomain.ProcessExit {Environment.ProcessId} {e}");
     Thread.Sleep(5_000);
 };
 
-Log("-----------");
+logger.Info("-----------");
 Thread.Sleep(-1);
 return 0;
-
-static void Log(string message, ConsoleColor? color = null)
-{
-    if (color.HasValue)
-    {
-        Console.ForegroundColor = ConsoleColor.Red;
-        Console.WriteLine($"[{Environment.ProcessId}] {message}");
-        Console.ResetColor();
-    }
-    else
-    {
-        Console.WriteLine($"[{Environment.ProcessId}] {message}");
-    }
-}

@@ -13,7 +13,7 @@ public class KeepSelfHostOptions
     /// <summary>
     /// Logger
     /// </summary>
-    public ISelfKeeperLogger? Logger { get; set; } = new InternalConsoleLogger();
+    public ISelfKeeperLogger? Logger { get; set; } = new DefaultConsoleLogger("KeepSelf");
 
     /// <summary>
     /// 进程退出后的重启延时

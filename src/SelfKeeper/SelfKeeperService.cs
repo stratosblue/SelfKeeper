@@ -59,7 +59,7 @@ internal sealed class SelfKeeperService
             IDisposable? processKillSignalMonitor = _features.Contains(KeepSelfFeatureFlag.DisableForceKillByHost)
                                                         ? null
                                                         : ChildProcessKillSignalMonitor.Create(Environment.ProcessId, sessionId, waitSuccess => ProcessKillSignalCallback(childProcess, waitSuccess));
-
+            
             try
             {
                 childProcess = Process.Start(GetProcessStartInfo(sessionId)) ?? throw new InvalidOperationException($"Start child process fail. {nameof(Process)}.{nameof(Process.Start)} returned null.");
@@ -73,7 +73,7 @@ internal sealed class SelfKeeperService
                     }
                     catch (Exception ex)
                     {
-                        _logger?.Warn("Shutdown has requested. Host force kill child process {processId} fail. {exceptionMessage}", childProcess.Id, ex.Message);
+                        _logger?.Warn("Shutdown has requested. Host force kill child process {ProcessId} fail. {ExceptionMessage}", childProcess.Id, ex.Message);
                     }
 
                     return null;

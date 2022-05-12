@@ -14,7 +14,7 @@ public class SelfKeeperEnvironmentTest
     [TestMethod]
     public void ThrowIfWithOutInit()
     {
-        Assert.ThrowsException<InvalidOperationException>(() => SelfKeeperEnvironment.IsChildProcess);
+        Assert.ThrowsException<InvalidOperationException>(() => SelfKeeperEnvironment.IsWorkerProcess);
         Assert.ThrowsException<InvalidOperationException>(() => SelfKeeperEnvironment.SessionId);
         Assert.ThrowsException<InvalidOperationException>(() => SelfKeeperEnvironment.RequestKillCurrentProcess());
     }

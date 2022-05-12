@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace SelfKeeper.Test;
 
 [TestClass]
-public class KeepSelfChildProcessOptionsTest
+public class KeepSelfWorkerProcessOptionsTest
 {
     [TestMethod]
     public void NoExceptionForInvalidValue()
@@ -15,11 +15,11 @@ public class KeepSelfChildProcessOptionsTest
         Check(" ");
         Check("\t");
         Check("\n");
-        Check("KeepSelfChildProcessOptionsTest");
+        Check("KeepSelfWorkerProcessOptionsTest");
 
         static void Check(string? value)
         {
-            Assert.IsFalse(KeepSelfChildProcessOptions.TryParseFromCommandLineArgumentValue(value!, out var options));
+            Assert.IsFalse(KeepSelfWorkerProcessOptions.TryParseFromCommandLineArgumentValue(value!, out var options));
             Assert.IsNull(options);
         }
     }
@@ -27,14 +27,14 @@ public class KeepSelfChildProcessOptionsTest
     [TestMethod]
     public void ShouldEqualAfterParse()
     {
-        var originOptions = new KeepSelfChildProcessOptions((uint)Random.Shared.Next())
+        var originOptions = new KeepSelfWorkerProcessOptions((uint)Random.Shared.Next())
         {
-            Features = KeepSelfFeatureFlag.ExitWhenHostExited | KeepSelfFeatureFlag.ForceGCAfterChildProcessExited,
+            Features = KeepSelfFeatureFlag.ExitWhenHostExited | KeepSelfFeatureFlag.ForceGCAfterWorkerProcessExited,
             ParentProcessId = Random.Shared.Next(),
         };
         var value = originOptions.ToCommandLineArgumentValue();
 
-        Assert.IsTrue(KeepSelfChildProcessOptions.TryParseFromCommandLineArgumentValue(value, out var newOptions));
+        Assert.IsTrue(KeepSelfWorkerProcessOptions.TryParseFromCommandLineArgumentValue(value, out var newOptions));
         Assert.IsNotNull(newOptions);
 
         Assert.AreEqual(originOptions.SessionId, newOptions.SessionId);

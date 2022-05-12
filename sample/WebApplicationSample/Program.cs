@@ -6,7 +6,7 @@ logger.Info($"Hello, World! ¡¾{Environment.OSVersion}¡¿");
 
 KeepSelf.Handle(args, options => options.RemoveFlag(KeepSelfFeatureFlag.SkipWhenDebuggerAttached | KeepSelfFeatureFlag.DisableForceKillByHost));
 
-logger.Info($"SelfKeeperEnvironment IsChildProcess: {SelfKeeperEnvironment.IsChildProcess}, SessionId: {SelfKeeperEnvironment.SessionId}");
+logger.Info($"SelfKeeperEnvironment IsWorkerProcess: {SelfKeeperEnvironment.IsWorkerProcess}, SessionId: {SelfKeeperEnvironment.SessionId}");
 
 var builder = WebApplication.CreateBuilder(args);
 

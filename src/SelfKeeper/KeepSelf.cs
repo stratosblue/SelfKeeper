@@ -20,31 +20,31 @@ public static class KeepSelf
 
     /// <summary>
     /// 接管自身监控逻辑<para/>
-    /// 如果当前为主进程，则启动子进程，对其进行监控及重启。并在接收到关闭信号后关闭子进程，以子进程的 <see cref="Process.ExitCode"/> 调用 <see cref="Environment.Exit(int)"/> 退出当前进程<para/>
-    /// 如果当前为子进程，则不进行处理，并立即返回
+    /// 如果当前为主进程，则启动工作进程，对其进行监控及重启。并在接收到关闭信号后关闭工作进程，以工作进程的 <see cref="Process.ExitCode"/> 调用 <see cref="Environment.Exit(int)"/> 退出当前进程<para/>
+    /// 如果当前为工作进程，则不进行处理，并立即返回
     /// </summary>
     /// <param name="args">程序启动参数</param>
     /// <param name="hostOptions">选项</param>
     /// <param name="setupAction">配置选项的委托</param>
     public static void Handle(string[] args, KeepSelfHostOptions? hostOptions = null)
     {
-        if (TryHandle(args, out var childProcessExitCode, hostOptions))
+        if (TryHandle(args, out var workerProcessExitCode, hostOptions))
         {
-            Environment.Exit(childProcessExitCode ?? 0);
+            Environment.Exit(workerProcessExitCode ?? 0);
         }
     }
 
     /// <summary>
     /// 尝试接管自身监控逻辑<para/>
-    /// 如果当前为主进程，则启动子进程，对其进行监控及重启。并在接收到关闭信号后关闭子进程<para/>
-    /// 如果当前为子进程，则不进行处理，并立即返回
+    /// 如果当前为主进程，则启动工作进程，对其进行监控及重启。并在接收到关闭信号后关闭工作进程<para/>
+    /// 如果当前为工作进程，则不进行处理，并立即返回
     /// </summary>
     /// <param name="args">程序启动参数</param>
-    /// <param name="childProcessExitCode">子进程的 <see cref="Process.ExitCode"/>。当前为主进程时才可能不为 null。</param>
+    /// <param name="workerProcessExitCode">工作进程的 <see cref="Process.ExitCode"/>。当前为主进程时才可能不为 null。</param>
     /// <param name="hostOptions">选项</param>
     /// <returns>当前为主进程时，返回true，否则返回false</returns>
     /// <exception cref="ArgumentException"></exception>
-    public static bool TryHandle(string[] args, out int? childProcessExitCode, KeepSelfHostOptions? hostOptions = null)
+    public static bool TryHandle(string[] args, out int? workerProcessExitCode, KeepSelfHostOptions? hostOptions = null)
     {
         SelfKeeperEnvironment.SetInitializationState();
 
@@ -52,46 +52,54 @@ public static class KeepSelf
 
         if (CheckIsNoKeepSelfOn(args, hostOptions))
         {
-            SelfKeeperEnvironment.IsChildProcess = false;
+            SelfKeeperEnvironment.IsWorkerProcess = false;
 
-            childProcessExitCode = null;
+            workerProcessExitCode = null;
             return false;
         }
 
-        var index = args.TakeWhile(m => !string.Equals(hostOptions.ChildProcessOptionsCommandArgumentName, m, StringComparison.OrdinalIgnoreCase)).Count();
-        if (index < args.Length - 1) //当前为子进程
+        var logger = hostOptions.Logger;
+
+        var index = args.TakeWhile(m => !string.Equals(hostOptions.WorkerProcessOptionsCommandArgumentName, m, StringComparison.OrdinalIgnoreCase)).Count();
+        if (index < args.Length - 1) //当前为工作进程
         {
             var keepSelfOptionValue = args[index + 1];
 
-            if (!KeepSelfChildProcessOptions.TryParseFromCommandLineArgumentValue(keepSelfOptionValue, out var options))
+            if (!KeepSelfWorkerProcessOptions.TryParseFromCommandLineArgumentValue(keepSelfOptionValue, out var options))
             {
-                throw new ArgumentException($"Incorrect value \"{keepSelfOptionValue}\" for \"{hostOptions.ChildProcessOptionsCommandArgumentName}\".");
+                throw new ArgumentException($"Incorrect value \"{keepSelfOptionValue}\" for \"{hostOptions.WorkerProcessOptionsCommandArgumentName}\".");
             }
 
-            SelfKeeperEnvironment.IsChildProcess = true;
+            SelfKeeperEnvironment.IsWorkerProcess = true;
             SelfKeeperEnvironment.ParentProcessId = options.ParentProcessId;
             SelfKeeperEnvironment.SessionId = options.SessionId;
 
+            logger?.Debug("Current process is worker process.", Environment.ProcessId);
+
             if (options.Features.Contains(KeepSelfFeatureFlag.ExitWhenHostExited))
             {
+                logger?.Debug($"Feature \"{nameof(KeepSelfFeatureFlag.ExitWhenHostExited)}\" enabled. The current process will exit when host process exited.");
                 WaitParentProcessExit(options.ParentProcessId, hostOptions.Logger);
             }
 
             if (!options.Features.Contains(KeepSelfFeatureFlag.DisableForceKillByHost))
             {
+                logger?.Debug($"Feature \"{nameof(KeepSelfFeatureFlag.DisableForceKillByHost)}\" disabled. The current process can request force kill by host process.");
                 SelfKeeperEnvironment.SetupTheHostKillMutex(options);
             }
 
-            childProcessExitCode = null;
+            workerProcessExitCode = null;
 
             return false;
         }
 
-        SelfKeeperEnvironment.IsChildProcess = false;
+        SelfKeeperEnvironment.IsWorkerProcess = false;
+
+        logger?.Debug("Current process is host process.", Environment.ProcessId);
 
         var selfKeeperService = new SelfKeeperService(options: hostOptions, baseProcessStartInfo: ProcessStartInfoUtil.CloneCurrentProcessStartInfo());
 
-        childProcessExitCode = selfKeeperService.Run();
+        workerProcessExitCode = selfKeeperService.Run();
 
         return true;
     }

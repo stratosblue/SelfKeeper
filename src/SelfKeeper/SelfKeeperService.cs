@@ -20,13 +20,13 @@ internal sealed class SelfKeeperService
 
         _logger = options.Logger;
 
-        _baseProcessStartInfo.ArgumentList.Add(options.ChildProcessOptionsCommandArgumentName);
-        _baseProcessStartInfo.ArgumentList.Add("KeepSelfChildProcessOptionsValue"); //占位
+        _baseProcessStartInfo.ArgumentList.Add(options.WorkerProcessOptionsCommandArgumentName);
+        _baseProcessStartInfo.ArgumentList.Add("KeepSelfWorkerProcessOptionsValue"); //占位
     }
 
     public int? Run()
     {
-        Process? childProcess = null;
+        Process? workerProcess = null;
 
         void HandlePosixSignal(PosixSignalContext context)
         {
@@ -35,17 +35,17 @@ internal sealed class SelfKeeperService
 
             try
             {
-                SendPosixSignal(childProcess, context.Signal);
+                SendPosixSignal(workerProcess, context.Signal);
             }
             catch (Exception ex)
             {
-                _logger?.Warn("Send posix signal to process {ProcessId} error. {ExceptionMessage}", childProcess?.Id.ToString() ?? string.Empty, ex.Message);
+                _logger?.Warn("Send posix signal to process {ProcessId} error. {ExceptionMessage}", workerProcess?.Id.ToString() ?? string.Empty, ex.Message);
             }
 
+            //忽略终止，等待工作进程退出
             context.Cancel = true;
         }
 
-        //忽略终止，等待子进程退出
         using var signalRegistrationSIGINT = PosixSignalRegistration.Create(PosixSignal.SIGINT, HandlePosixSignal);
         using var signalRegistrationSIGQUIT = PosixSignalRegistration.Create(PosixSignal.SIGQUIT, HandlePosixSignal);
         using var signalRegistrationSIGTERM = PosixSignalRegistration.Create(PosixSignal.SIGTERM, HandlePosixSignal);
@@ -58,40 +58,40 @@ internal sealed class SelfKeeperService
 
             IDisposable? processKillSignalMonitor = _features.Contains(KeepSelfFeatureFlag.DisableForceKillByHost)
                                                         ? null
-                                                        : ChildProcessKillSignalMonitor.Create(Environment.ProcessId, sessionId, waitSuccess => ProcessKillSignalCallback(childProcess, waitSuccess));
+                                                        : WorkerProcessKillSignalMonitor.Create(Environment.ProcessId, sessionId, waitSuccess => ProcessKillSignalCallback(workerProcess, waitSuccess));
             
             try
             {
-                childProcess = Process.Start(GetProcessStartInfo(sessionId)) ?? throw new InvalidOperationException($"Start child process fail. {nameof(Process)}.{nameof(Process.Start)} returned null.");
+                workerProcess = Process.Start(GetProcessStartInfo(sessionId)) ?? throw new InvalidOperationException($"Start worker process fail. {nameof(Process)}.{nameof(Process.Start)} returned null.");
 
                 if (_isShutdownRequested)
                 {
                     try
                     {
-                        childProcess.Kill(true);
-                        return childProcess.ExitCode;
+                        workerProcess.Kill(true);
+                        return workerProcess.ExitCode;
                     }
                     catch (Exception ex)
                     {
-                        _logger?.Warn("Shutdown has requested. Host force kill child process {ProcessId} fail. {ExceptionMessage}", childProcess.Id, ex.Message);
+                        _logger?.Warn("Shutdown has requested. Host force kill worker process {ProcessId} fail. {ExceptionMessage}", workerProcess.Id, ex.Message);
                     }
 
                     return null;
                 }
 
-                _logger?.Debug("Process {ProcessId} for session {SessionId} was started.", childProcess.Id, sessionId);
+                _logger?.Debug("Worker process {ProcessId} for session {SessionId} was started.", workerProcess.Id, sessionId);
 
-                childProcess.WaitForExit();
+                workerProcess.WaitForExit();
             }
             catch (Exception ex)
             {
                 if (_isShutdownRequested)
                 {
-                    _logger?.Debug("Start and wait child process fail. And shutdown has requested. {ExceptionMessage}", _options.StartFailRetryDelay.TotalSeconds, ex.Message);
+                    _logger?.Debug("Start and wait worker process fail. And shutdown has requested. {ExceptionMessage}", _options.StartFailRetryDelay.TotalSeconds, ex.Message);
                     return null;
                 }
 
-                _logger?.Error("Start and wait child process fail. Retry after {StartFailRetryDelay} seconds. {ExceptionMessage}", _options.StartFailRetryDelay.TotalSeconds, ex.Message);
+                _logger?.Error("Start and wait worker process fail. Retry after {StartFailRetryDelay} seconds. {ExceptionMessage}", _options.StartFailRetryDelay.TotalSeconds, ex.Message);
                 Thread.Sleep(_options.StartFailRetryDelay);
                 continue;
             }
@@ -102,14 +102,14 @@ internal sealed class SelfKeeperService
 
             if (_isShutdownRequested)
             {
-                return childProcess.ExitCode;
+                return workerProcess.ExitCode;
             }
 
-            _logger?.Warn("Child process \"{ChildProcessId}\" for session \"{SessionId}\" exited with code \"{ChildProcessExitCode}\". A new process is about to start after {RestartDelay} seconds.", childProcess.Id, sessionId, childProcess.ExitCode, _options.RestartDelay.TotalSeconds);
+            _logger?.Warn("Worker process \"{WorkerProcessId}\" for session \"{SessionId}\" exited with code \"{WorkerProcessExitCode}\". A new process is about to start after {RestartDelay} seconds.", workerProcess.Id, sessionId, workerProcess.ExitCode, _options.RestartDelay.TotalSeconds);
 
-            childProcess = null;
+            workerProcess = null;
 
-            CheckForceGC(KeepSelfFeatureFlag.ForceGCAfterChildProcessExited);
+            CheckForceGC(KeepSelfFeatureFlag.ForceGCAfterWorkerProcessExited);
 
             Thread.Sleep(_options.RestartDelay);
         }
@@ -138,28 +138,28 @@ internal sealed class SelfKeeperService
 
     private ProcessStartInfo GetProcessStartInfo(uint sessionId)
     {
-        var childProcessOptions = new KeepSelfChildProcessOptions(sessionId)
+        var workerProcessOptions = new KeepSelfWorkerProcessOptions(sessionId)
         {
             ParentProcessId = Environment.ProcessId,
             Features = _features,
         };
 
         _baseProcessStartInfo.ArgumentList.RemoveAt(_baseProcessStartInfo.ArgumentList.Count - 1);
-        _baseProcessStartInfo.ArgumentList.Add(childProcessOptions.ToCommandLineArgumentValue());
+        _baseProcessStartInfo.ArgumentList.Add(workerProcessOptions.ToCommandLineArgumentValue());
 
         return _baseProcessStartInfo;
     }
 
-    private void ProcessKillSignalCallback(Process? childProcess, bool waitSuccess)
+    private void ProcessKillSignalCallback(Process? workerProcess, bool waitSuccess)
     {
-        if (childProcess is not Process process)
+        if (workerProcess is not Process process)
         {
             return;
         }
 
         if (waitSuccess)
         {
-            _logger?.Warn("Signal for force kill by host received. Force kill child process {ProcessId}.", process.Id);
+            _logger?.Warn("Signal for force kill by host received. Force kill worker process {ProcessId}.", process.Id);
         }
         else if (_isShutdownRequested)
         {
@@ -167,7 +167,7 @@ internal sealed class SelfKeeperService
         }
         else
         {
-            _logger?.Warn("Process kill signal wait fail. The process may have exited. Try to force kill the child process {ProcessId}.", process.Id);
+            _logger?.Warn("Process kill signal wait fail. The process may have exited. Try to force kill the worker process {ProcessId}.", process.Id);
         }
 
         ForceKill(process);
@@ -183,7 +183,7 @@ internal sealed class SelfKeeperService
             }
             catch (Exception ex)
             {
-                _logger?.Warn("Host force kill child process {ProcessId} fail. {ExceptionMessage}", process.Id, ex.Message);
+                _logger?.Warn("Host force kill worker process {ProcessId} fail. {ExceptionMessage}", process.Id, ex.Message);
             }
         }
     }

@@ -12,7 +12,7 @@ public enum KeepSelfFeatureFlag
     None = 0,
 
     /// <summary>
-    /// 当主进程退出时，子进程也退出
+    /// 当主进程退出时，工作进程也退出
     /// </summary>
     ExitWhenHostExited = 1,
 
@@ -27,9 +27,9 @@ public enum KeepSelfFeatureFlag
     ForceGCBeforeRunKeepService = 1 << 2,
 
     /// <summary>
-    /// 子进程退出时，触发强制GC
+    /// 工作进程退出时，触发强制GC
     /// </summary>
-    ForceGCAfterChildProcessExited = 1 << 3,
+    ForceGCAfterWorkerProcessExited = 1 << 3,
 
     /// <summary>
     /// 禁用宿主程序强制关闭功能

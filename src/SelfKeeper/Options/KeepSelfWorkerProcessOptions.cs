@@ -3,9 +3,9 @@
 namespace SelfKeeper;
 
 /// <summary>
-/// SelfKeeper的子进程选项
+/// SelfKeeper的工作进程选项
 /// </summary>
-internal class KeepSelfChildProcessOptions
+internal class KeepSelfWorkerProcessOptions
 {
     public KeepSelfFeatureFlag Features { get; set; }
 
@@ -13,12 +13,12 @@ internal class KeepSelfChildProcessOptions
 
     public uint SessionId { get; }
 
-    public KeepSelfChildProcessOptions(uint sessionId)
+    public KeepSelfWorkerProcessOptions(uint sessionId)
     {
         SessionId = sessionId;
     }
 
-    public static bool TryParseFromCommandLineArgumentValue(string value, [NotNullWhen(true)] out KeepSelfChildProcessOptions? options)
+    public static bool TryParseFromCommandLineArgumentValue(string value, [NotNullWhen(true)] out KeepSelfWorkerProcessOptions? options)
     {
         options = null;
         if (string.IsNullOrWhiteSpace(value))
@@ -35,6 +35,11 @@ internal class KeepSelfChildProcessOptions
 
         using var ms = new MemoryStream(buffer);
         using var br = new BinaryReader(ms);
+
+        if (br.ReadByte() != 0)
+        {
+            return false;
+        }
 
         try
         {
@@ -58,6 +63,8 @@ internal class KeepSelfChildProcessOptions
         using var ms = new MemoryStream();
         using var bw = new BinaryWriter(ms);
 
+        //首字节为0，避免错误的解析普通字符串
+        bw.Write((byte)0);
         bw.Write(SessionId);
         bw.Write(ParentProcessId);
         bw.Write((int)Features);

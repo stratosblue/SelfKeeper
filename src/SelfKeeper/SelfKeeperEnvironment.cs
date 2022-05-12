@@ -8,9 +8,9 @@ namespace SelfKeeper;
 public static class SelfKeeperEnvironment
 {
     /// <summary>
-    /// 默认命令行参数名称 - 子进程选项
+    /// 默认命令行参数名称 - 工作进程选项
     /// </summary>
-    public const string DefaultCommandArgumentNameChildProcessOptions = "--Keep-Self";
+    public const string DefaultCommandArgumentNameWorkerProcessOptions = "--Keep-Self";
 
     /// <summary>
     /// 默认命令行参数名称 - 不启用 KeepSelf
@@ -23,32 +23,32 @@ public static class SelfKeeperEnvironment
     public const string DefaultEnvironmentVariableNameNoKeepSelf = "NoKeepSelf";
 
     private static uint s_increaseSessionId;
-    private static bool? s_isChildProcess;
+    private static bool? s_isWorkerProcess;
     private static int s_isInitiated = 0;
     private static int? s_parentProcessId;
     private static uint? s_sessionId;
 
     /// <summary>
-    /// 是否为子进程
+    /// 是否为工作进程
     /// </summary>
-    public static bool IsChildProcess
+    public static bool IsWorkerProcess
     {
-        get => s_isChildProcess ?? throw new InvalidOperationException("SelfKeeper not initialization successful yet.");
-        internal set => s_isChildProcess = value;
+        get => s_isWorkerProcess ?? throw new InvalidOperationException("SelfKeeper not initialization successful yet.");
+        internal set => s_isWorkerProcess = value;
     }
 
     /// <summary>
-    /// 父进程ID，当前为子进程时才会有具体的值
+    /// 父进程ID，当前为工作进程时才会有具体的值
     /// </summary>
     public static int? ParentProcessId { get => s_parentProcessId; internal set => s_parentProcessId = value; }
 
     /// <summary>
-    /// SessionId，当前为子进程时才会有具体的值
+    /// SessionId，当前为工作进程时才会有具体的值
     /// </summary>
     public static uint? SessionId
     {
         get => s_isInitiated > 0
-                 ? IsChildProcess
+                 ? IsWorkerProcess
                      ? s_sessionId ?? throw new InvalidOperationException("SelfKeeper not initialization successful yet.")
                      : null
                  : throw new InvalidOperationException("SelfKeeper not initialization successful yet.");
@@ -89,12 +89,12 @@ public static class SelfKeeperEnvironment
     private static volatile ManualResetEvent? s_hostKillEvent;
 
     /// <summary>
-    /// 请求主进程关闭当前进程（仅当当前进程为子进程，且未开启 <see cref="KeepSelfFeatureFlag.DisableForceKillByHost"/> 时有效）
+    /// 请求主进程关闭当前进程（仅当当前进程为工作进程，且未开启 <see cref="KeepSelfFeatureFlag.DisableForceKillByHost"/> 时有效）
     /// </summary>
     /// <returns>请求是否成功</returns>
     public static bool RequestKillCurrentProcess()
     {
-        if (!IsChildProcess
+        if (!IsWorkerProcess
             || s_hostKillEvent is not ManualResetEvent hostKillEvent)
         {
             return false;
@@ -115,11 +115,11 @@ public static class SelfKeeperEnvironment
         }
     }
 
-    internal static void SetupTheHostKillMutex(KeepSelfChildProcessOptions options)
+    internal static void SetupTheHostKillMutex(KeepSelfWorkerProcessOptions options)
     {
-        if (!IsChildProcess)
+        if (!IsWorkerProcess)
         {
-            throw new InvalidOperationException("Only can call this method in child process.");
+            throw new InvalidOperationException("Only can call this method in worker process.");
         }
 
         var hostKillEvent = new ManualResetEvent(false);

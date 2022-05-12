@@ -38,13 +38,13 @@ public class KeepSelfHostOptions
 
     #region CommandArgumentNames
 
-    private string _childProcessOptionsCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameChildProcessOptions;
+    private string _workerProcessOptionsCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameWorkerProcessOptions;
     private string _noKeepSelfCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameNoKeepSelf;
 
     /// <summary>
-    /// 命令行参数名称 - 子进程选项 (默认: <see cref="SelfKeeperEnvironment.DefaultCommandArgumentNameChildProcessOptions"/>)
+    /// 命令行参数名称 - 工作进程选项 (默认: <see cref="SelfKeeperEnvironment.DefaultCommandArgumentNameWorkerProcessOptions"/>)
     /// </summary>
-    public string ChildProcessOptionsCommandArgumentName { get => _childProcessOptionsCommandArgumentName; set => SetCommandArgumentName(ref _childProcessOptionsCommandArgumentName, value); }
+    public string WorkerProcessOptionsCommandArgumentName { get => _workerProcessOptionsCommandArgumentName; set => SetCommandArgumentName(ref _workerProcessOptionsCommandArgumentName, value); }
 
     /// <summary>
     /// 命令行参数名称 - 不启用 KeepSelf (默认: <see cref="SelfKeeperEnvironment.DefaultCommandArgumentNameNoKeepSelf"/>)

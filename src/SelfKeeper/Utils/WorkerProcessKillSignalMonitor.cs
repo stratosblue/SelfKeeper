@@ -1,29 +1,29 @@
 ﻿namespace SelfKeeper;
 
 /// <summary>
-/// 子进程关闭信号监控器
+/// 工作进程关闭信号监控器
 /// </summary>
-internal sealed class ChildProcessKillSignalMonitor : IDisposable
+internal sealed class WorkerProcessKillSignalMonitor : IDisposable
 {
-    public delegate void ChildProcessKillSignalCallback(bool waitSuccess);
+    public delegate void WorkerProcessKillSignalCallback(bool waitSuccess);
 
-    private readonly ChildProcessKillSignalCallback _callback;
+    private readonly WorkerProcessKillSignalCallback _callback;
     private readonly string _mutexName;
     private volatile bool _isDisposed;
     private int _isStarted = 0;
     private volatile Mutex? _mutex = null;
 
-    public ChildProcessKillSignalMonitor(string mutexName, ChildProcessKillSignalCallback callback)
+    public WorkerProcessKillSignalMonitor(string mutexName, WorkerProcessKillSignalCallback callback)
     {
         _mutexName = mutexName ?? throw new ArgumentNullException(nameof(mutexName));
         _callback = callback ?? throw new ArgumentNullException(nameof(callback));
     }
 
-    public static IDisposable Create(int processId, uint sessionId, ChildProcessKillSignalCallback callback)
+    public static IDisposable Create(int processId, uint sessionId, WorkerProcessKillSignalCallback callback)
     {
         var sessionName = SelfKeeperEnvironment.CreateSessionName(processId, sessionId);
 
-        var monitor = new ChildProcessKillSignalMonitor($"Global\\{sessionName}", callback);
+        var monitor = new WorkerProcessKillSignalMonitor($"Global\\{sessionName}", callback);
 
         monitor.Start();
 

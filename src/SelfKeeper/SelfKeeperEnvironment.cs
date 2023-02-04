@@ -29,7 +29,7 @@ public static class SelfKeeperEnvironment
     private static uint? s_sessionId;
 
     /// <summary>
-    /// 是否为工作进程
+    /// 当前进程是否为工作进程
     /// </summary>
     public static bool IsWorkerProcess
     {

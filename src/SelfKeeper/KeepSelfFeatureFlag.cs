@@ -32,7 +32,7 @@ public enum KeepSelfFeatureFlag
     ForceGCAfterWorkerProcessExited = 1 << 3,
 
     /// <summary>
-    /// 禁用宿主程序强制关闭功能
+    /// 禁用主进程强制关闭功能
     /// </summary>
     DisableForceKillByHost = 1 << 4,
 }

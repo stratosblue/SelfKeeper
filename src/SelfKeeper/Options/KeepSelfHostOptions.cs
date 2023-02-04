@@ -6,6 +6,11 @@
 public class KeepSelfHostOptions
 {
     /// <summary>
+    /// 进行重启时排除的ExitCode（列表内的Code出现时认为工作进程正常完成，不需要再重启）
+    /// </summary>
+    public List<int> ExcludeRestartExitCodes { get; set; } = new();
+
+    /// <summary>
     /// 特性标识
     /// </summary>
     public KeepSelfFeatureFlag Features { get; set; } = unchecked((KeepSelfFeatureFlag)0xFFFF_FFFF);
@@ -38,18 +43,18 @@ public class KeepSelfHostOptions
 
     #region CommandArgumentNames
 
-    private string _workerProcessOptionsCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameWorkerProcessOptions;
     private string _noKeepSelfCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameNoKeepSelf;
-
-    /// <summary>
-    /// 命令行参数名称 - 工作进程选项 (默认: <see cref="SelfKeeperEnvironment.DefaultCommandArgumentNameWorkerProcessOptions"/>)
-    /// </summary>
-    public string WorkerProcessOptionsCommandArgumentName { get => _workerProcessOptionsCommandArgumentName; set => SetCommandArgumentName(ref _workerProcessOptionsCommandArgumentName, value); }
+    private string _workerProcessOptionsCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameWorkerProcessOptions;
 
     /// <summary>
     /// 命令行参数名称 - 不启用 KeepSelf (默认: <see cref="SelfKeeperEnvironment.DefaultCommandArgumentNameNoKeepSelf"/>)
     /// </summary>
     public string NoKeepSelfCommandArgumentName { get => _noKeepSelfCommandArgumentName; set => SetCommandArgumentName(ref _noKeepSelfCommandArgumentName, value); }
+
+    /// <summary>
+    /// 命令行参数名称 - 工作进程选项 (默认: <see cref="SelfKeeperEnvironment.DefaultCommandArgumentNameWorkerProcessOptions"/>)
+    /// </summary>
+    public string WorkerProcessOptionsCommandArgumentName { get => _workerProcessOptionsCommandArgumentName; set => SetCommandArgumentName(ref _workerProcessOptionsCommandArgumentName, value); }
 
     private static void SetCommandArgumentName(ref string target, string value)
     {

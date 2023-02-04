@@ -43,7 +43,35 @@ KeepSelf.Handle(args, options =>
     options.WorkerProcessOptionsCommandArgumentName = "--worker-process-options"; //自定义工作进程选项的参数名
     options.NoKeepSelfCommandArgumentName = "--no-keep-self"; //自定义不启用 KeepSelf 的参数名
     options.NoKeepSelfEnvironmentVariableName = "NoWatchDog"; //自定义不启用 KeepSelf 的环境变量名
+    options.ExcludeRestartExitCodes.Add(0); //添加工作进程执行成功的退出码，当工作进程退出码在该列表内时，不再进行重启
 });
 ```
  - 主进程会在 `KeepSelf.Handle` 阻塞，启动并监控工作进程；
  - 主进程在退出时会在 `KeepSelf.Handle` 内调用 `Environment.Exit` 退出，不会执行后面的代码；
+
+-------
+
+#### `options flags`
+ 
+ 默认配置下开启了所有flag
+
+ - `ExitWhenHostExited`: 当主进程退出时，工作进程也退出
+ - `SkipWhenDebuggerAttached`: 已附加调试器时不进行处理
+ - `ForceGCBeforeRunKeepService`: 在运行保持服务前，触发强制GC
+ - `ForceGCAfterWorkerProcessExited`: 工作进程退出时，触发强制GC
+ - `DisableForceKillByHost`: 禁用主进程强制关闭功能
+
+-------
+
+### 2.3 环境相关操作
+
+#### 获取环境信息
+- `SelfKeeperEnvironment.IsWorkerProcess`: 当前进程是否为工作进程
+- `SelfKeeperEnvironment.ParentProcessId`: 父进程ID，当前为工作进程时才会有具体的值
+- `SelfKeeperEnvironment.SessionId`: SessionId，当前为工作进程时才会有具体的值
+
+#### 请求工作进程强制终止当前工作进程
+```C#
+SelfKeeperEnvironment.RequestKillCurrentProcess();
+```
+请求主进程关闭当前进程（仅当当前进程为工作进程，且未开启 DisableForceKillByHost 时有效），主进程将会调用 `Process.Kill(entireProcessTree: true)` 结束当前进程

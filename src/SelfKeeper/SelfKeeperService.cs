@@ -59,7 +59,7 @@ internal sealed class SelfKeeperService
             IDisposable? processKillSignalMonitor = _features.Contains(KeepSelfFeatureFlag.DisableForceKillByHost)
                                                         ? null
                                                         : WorkerProcessKillSignalMonitor.Create(Environment.ProcessId, sessionId, waitSuccess => ProcessKillSignalCallback(workerProcess, waitSuccess));
-            
+
             try
             {
                 workerProcess = Process.Start(GetProcessStartInfo(sessionId)) ?? throw new InvalidOperationException($"Start worker process fail. {nameof(Process)}.{nameof(Process.Start)} returned null.");
@@ -82,6 +82,14 @@ internal sealed class SelfKeeperService
                 _logger?.Debug("Worker process {ProcessId} for session {SessionId} was started.", workerProcess.Id, sessionId);
 
                 workerProcess.WaitForExit();
+
+                var exitCode = workerProcess.ExitCode;
+                if (_options.ExcludeRestartExitCodes?.Contains(exitCode) == true)
+                {
+                    //认为程序正常退出
+                    _logger?.Info("Worker process \"{WorkerProcessId}\" for session \"{SessionId}\" exited with code \"{WorkerProcessExitCode}\". This exit code will not restart.", workerProcess.Id, sessionId, workerProcess.ExitCode);
+                    return exitCode;
+                }
             }
             catch (Exception ex)
             {

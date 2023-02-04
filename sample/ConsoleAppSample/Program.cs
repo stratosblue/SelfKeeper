@@ -15,6 +15,7 @@ KeepSelf.Handle(args, options =>
     options.WorkerProcessOptionsCommandArgumentName = "--worker-process-options"; //自定义工作进程选项的参数名
     options.NoKeepSelfCommandArgumentName = "--no-keep-self"; //自定义不启用 KeepSelf 的参数名
     options.NoKeepSelfEnvironmentVariableName = "NoWatchDog"; //自定义不启用 KeepSelf 的环境变量名
+    options.ExcludeRestartExitCodes.Add(0); //添加工作进程执行成功的退出码，当工作进程退出码在该列表内时，不再进行重启
 });
 
 logger.Info($"SelfKeeperEnvironment IsWorkerProcess: {SelfKeeperEnvironment.IsWorkerProcess}, SessionId: {SelfKeeperEnvironment.SessionId}");

@@ -30,6 +30,9 @@ public class KeepSelfHostOptions
     /// </summary>
     public TimeSpan StartFailRetryDelay { get; set; } = TimeSpan.FromSeconds(3);
 
+    /// <inheritdoc cref="IWorkerProcessLifeCircleManager"/>
+    public IWorkerProcessLifeCircleManager? WorkerProcessLifeCircleManager { get; set; }
+
     #region EnvironmentVariableNames
 
     private string _noKeepSelfEnvironmentVariableName = SelfKeeperEnvironment.DefaultEnvironmentVariableNameNoKeepSelf;
@@ -44,6 +47,7 @@ public class KeepSelfHostOptions
     #region CommandArgumentNames
 
     private string _noKeepSelfCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameNoKeepSelf;
+
     private string _workerProcessOptionsCommandArgumentName = SelfKeeperEnvironment.DefaultCommandArgumentNameWorkerProcessOptions;
 
     /// <summary>

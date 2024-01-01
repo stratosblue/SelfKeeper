@@ -24,13 +24,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplicationSample", "sam
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SelfKeeper.Test", "test\SelfKeeper.Test\SelfKeeper.Test.csproj", "{BAB1E827-67C3-4F4E-AD2D-FE91D895E789}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".github", ".github", "{BD60E50D-8925-4D36-9D2B-E5AB1D017E9D}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{5B7A17AD-E9D6-4084-A761-0F1C661F4750}"
-	ProjectSection(SolutionItems) = preProject
-		.github\workflows\PublishNugetPackage.yml = .github\workflows\PublishNugetPackage.yml
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -62,7 +55,6 @@ Global
 		{6A97C833-8E4B-422C-8E2C-B51F45DC06CB} = {BF324BD0-12A9-4F52-9529-9E50B8C72605}
 		{27F5E226-6C20-47D5-BCCE-D859DB9E51B9} = {BF324BD0-12A9-4F52-9529-9E50B8C72605}
 		{BAB1E827-67C3-4F4E-AD2D-FE91D895E789} = {9E7A7FCE-0223-4656-BBB6-FC83BF8D562E}
-		{5B7A17AD-E9D6-4084-A761-0F1C661F4750} = {BD60E50D-8925-4D36-9D2B-E5AB1D017E9D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {81353B47-3ED3-45FF-B4A2-5096F5EE7975}

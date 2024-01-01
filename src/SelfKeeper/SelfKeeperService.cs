@@ -6,9 +6,15 @@ namespace SelfKeeper;
 internal sealed class SelfKeeperService
 {
     private readonly ProcessStartInfo _baseProcessStartInfo;
+
     private readonly KeepSelfFeatureFlag _features;
+
     private readonly ILogger? _logger;
+
     private readonly KeepSelfHostOptions _options;
+
+    private readonly IWorkerProcessLifeCircleManager? _workerProcessLifeCircleManager;
+
     private volatile bool _isShutdownRequested = false;
 
     public SelfKeeperService(KeepSelfHostOptions options, ProcessStartInfo baseProcessStartInfo)
@@ -19,6 +25,8 @@ internal sealed class SelfKeeperService
         _features = options.Features;
 
         _logger = options.Logger;
+
+        _workerProcessLifeCircleManager = options.WorkerProcessLifeCircleManager;
 
         _baseProcessStartInfo.ArgumentList.Add(options.WorkerProcessOptionsCommandArgumentName);
         _baseProcessStartInfo.ArgumentList.Add("KeepSelfWorkerProcessOptionsValue"); //占位
@@ -52,6 +60,14 @@ internal sealed class SelfKeeperService
 
         CheckForceGC(KeepSelfFeatureFlag.ForceGCBeforeRunKeepService);
 
+        Func<ProcessStartInfo, Process> startWorkerProcessDelegate = static processStartInfo => Process.Start(processStartInfo) ?? throw new InvalidOperationException($"Start worker process fail. {nameof(Process)}.{nameof(Process.Start)} returned null.");
+
+        if (_workerProcessLifeCircleManager is not null)
+        {
+            var defaultWorkerProcessDelegate = startWorkerProcessDelegate;
+            startWorkerProcessDelegate = processStartInfo => _workerProcessLifeCircleManager.OnStarting(processStartInfo, defaultWorkerProcessDelegate);
+        }
+
         while (!_isShutdownRequested)
         {
             var sessionId = SelfKeeperEnvironment.GenerateSessionId();
@@ -62,13 +78,16 @@ internal sealed class SelfKeeperService
 
             try
             {
-                workerProcess = Process.Start(GetProcessStartInfo(sessionId)) ?? throw new InvalidOperationException($"Start worker process fail. {nameof(Process)}.{nameof(Process.Start)} returned null.");
+                workerProcess = startWorkerProcessDelegate(GetProcessStartInfo(sessionId));
 
                 if (_isShutdownRequested)
                 {
                     try
                     {
                         workerProcess.Kill(true);
+
+                        workerProcess = _workerProcessLifeCircleManager?.OnExited(workerProcess) ?? workerProcess;
+
                         return workerProcess.ExitCode;
                     }
                     catch (Exception ex)
@@ -82,6 +101,8 @@ internal sealed class SelfKeeperService
                 _logger?.Debug("Worker process {ProcessId} for session {SessionId} was started.", workerProcess.Id, sessionId);
 
                 workerProcess.WaitForExit();
+
+                workerProcess = _workerProcessLifeCircleManager?.OnExited(workerProcess) ?? workerProcess;
 
                 var exitCode = workerProcess.ExitCode;
                 if (_options.ExcludeRestartExitCodes?.Contains(exitCode) == true)

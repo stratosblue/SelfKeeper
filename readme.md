@@ -24,7 +24,7 @@ A library that lets applications run as their own watchdog.
 ### 2.1 安装`Nuget`包
 
 ```shell
-dotnet add package SelfKeeper --prerelease
+dotnet add package SelfKeeper
 ```
 
 ### 2.2 启用SelfKeeper
@@ -56,7 +56,7 @@ KeepSelf.Handle(args, options =>
  默认配置下开启了所有flag
 
  - `ExitWhenHostExited`: 当主进程退出时，工作进程也退出
- - `SkipWhenDebuggerAttached`: 已附加调试器时不进行处理
+ - `SkipWhenDebuggerAttached`: 已附加调试器时不启动子进程
  - `ForceGCBeforeRunKeepService`: 在运行保持服务前，触发强制GC
  - `ForceGCAfterWorkerProcessExited`: 工作进程退出时，触发强制GC
  - `DisableForceKillByHost`: 禁用主进程强制关闭功能
@@ -70,7 +70,7 @@ KeepSelf.Handle(args, options =>
 - `SelfKeeperEnvironment.ParentProcessId`: 父进程ID，当前为工作进程时才会有具体的值
 - `SelfKeeperEnvironment.SessionId`: SessionId，当前为工作进程时才会有具体的值
 
-#### 请求工作进程强制终止当前工作进程
+#### 请求主进程强制终止当前工作进程
 ```C#
 SelfKeeperEnvironment.RequestKillCurrentProcess();
 ```

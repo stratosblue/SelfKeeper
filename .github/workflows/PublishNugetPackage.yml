@@ -26,6 +26,8 @@ jobs:
       run: dotnet restore
     - name: build
       run: dotnet build --no-restore -c Release ./src/SelfKeeper/SelfKeeper.csproj
+    - name: test
+      run: dotnet test --no-restore -c Release
     - name: pack
       run: dotnet pack -c Release -o ./output --include-symbols
 
@@ -38,4 +40,4 @@ jobs:
     - name: push package
       shell: pwsh
       working-directory: ./output
-      run: Get-ChildItem -File -Filter '*.nupkg' | ForEach-Object { dotnet nuget push $_ -k ${{steps.login.outputs.NUGET_API_KEY}}} -s https://api.nuget.org/v3/index.json --no-service-endpoint --skip-duplicate; dotnet nuget push $_ -k ${{secrets.NUGET_GITHUB_KEY}} -s https://nuget.pkg.github.com/StratosBlue/index.json --no-service-endpoint --skip-duplicate; }
+      run: Get-ChildItem -File -Filter '*.nupkg' | ForEach-Object { dotnet nuget push $_ -k ${{steps.login.outputs.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --no-service-endpoint --skip-duplicate; dotnet nuget push $_ -k ${{secrets.NUGET_GITHUB_KEY}} -s https://nuget.pkg.github.com/StratosBlue/index.json --no-service-endpoint --skip-duplicate; }

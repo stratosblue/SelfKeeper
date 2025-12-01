@@ -3,21 +3,31 @@
 /// <summary>
 /// 工作进程关闭信号监控器
 /// </summary>
-internal sealed class WorkerProcessKillSignalMonitor : IDisposable
+internal sealed class WorkerProcessKillSignalMonitor(string mutexName,
+                                                     WorkerProcessKillSignalMonitor.WorkerProcessKillSignalCallback callback)
+    : IDisposable
 {
+    #region Public 委托
+
     public delegate void WorkerProcessKillSignalCallback(bool waitSuccess);
 
-    private readonly WorkerProcessKillSignalCallback _callback;
-    private readonly string _mutexName;
+    #endregion Public 委托
+
+    #region Private 字段
+
+    private readonly WorkerProcessKillSignalCallback _callback = callback ?? throw new ArgumentNullException(nameof(callback));
+
+    private readonly string _mutexName = mutexName ?? throw new ArgumentNullException(nameof(mutexName));
+
     private volatile bool _isDisposed;
+
     private int _isStarted = 0;
+
     private volatile Mutex? _mutex = null;
 
-    public WorkerProcessKillSignalMonitor(string mutexName, WorkerProcessKillSignalCallback callback)
-    {
-        _mutexName = mutexName ?? throw new ArgumentNullException(nameof(mutexName));
-        _callback = callback ?? throw new ArgumentNullException(nameof(callback));
-    }
+    #endregion Private 字段
+
+    #region Public 方法
 
     public static IDisposable Create(int processId, uint sessionId, WorkerProcessKillSignalCallback callback)
     {
@@ -35,6 +45,10 @@ internal sealed class WorkerProcessKillSignalMonitor : IDisposable
         _isDisposed = true;
         _mutex?.Dispose();
     }
+
+    #endregion Public 方法
+
+    #region Private 方法
 
     private void Start()
     {
@@ -81,4 +95,6 @@ internal sealed class WorkerProcessKillSignalMonitor : IDisposable
             }
         }, TaskCreationOptions.LongRunning);
     }
+
+    #endregion Private 方法
 }

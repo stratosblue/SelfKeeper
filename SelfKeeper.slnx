@@ -1,0 +1,23 @@
+<Solution>
+  <Folder Name="/sample/">
+    <Project Path="sample/ConsoleAppSample/ConsoleAppSample.csproj" />
+    <Project Path="sample/WebApplicationSample/WebApplicationSample.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path=".dockerignore" />
+    <File Path=".editorconfig" />
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="CodeMaid.config" />
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+    <File Path="LICENSE" />
+    <File Path="readme.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/SelfKeeper/SelfKeeper.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/SelfKeeper.Test/SelfKeeper.Test.csproj" />
+  </Folder>
+</Solution>

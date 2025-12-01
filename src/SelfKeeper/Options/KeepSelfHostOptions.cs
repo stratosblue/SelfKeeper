@@ -8,7 +8,7 @@ public class KeepSelfHostOptions
     /// <summary>
     /// 进行重启时排除的ExitCode（列表内的Code出现时认为工作进程正常完成，不需要再重启）
     /// </summary>
-    public List<int> ExcludeRestartExitCodes { get; set; } = new();
+    public List<int> ExcludeRestartExitCodes { get; set; } = [];
 
     /// <summary>
     /// 特性标识

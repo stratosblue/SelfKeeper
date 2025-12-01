@@ -5,18 +5,19 @@ namespace SelfKeeper;
 /// <summary>
 /// SelfKeeper的工作进程选项
 /// </summary>
-internal class KeepSelfWorkerProcessOptions
+internal class KeepSelfWorkerProcessOptions(uint sessionId)
 {
+    #region Public 属性
+
     public KeepSelfFeatureFlag Features { get; set; }
 
     public int ParentProcessId { get; init; }
 
-    public uint SessionId { get; }
+    public uint SessionId { get; } = sessionId;
 
-    public KeepSelfWorkerProcessOptions(uint sessionId)
-    {
-        SessionId = sessionId;
-    }
+    #endregion Public 属性
+
+    #region Public 方法
 
     public static bool TryParseFromCommandLineArgumentValue(string value, [NotNullWhen(true)] out KeepSelfWorkerProcessOptions? options)
     {
@@ -71,4 +72,6 @@ internal class KeepSelfWorkerProcessOptions
 
         return Convert.ToBase64String(ms.ToArray());
     }
+
+    #endregion Public 方法
 }

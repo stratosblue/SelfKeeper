@@ -20,7 +20,7 @@ KeepSelf.Handle(args, options =>
 
 logger.Info($"SelfKeeperEnvironment IsWorkerProcess: {SelfKeeperEnvironment.IsWorkerProcess}, SessionId: {SelfKeeperEnvironment.SessionId}");
 
-Task.Run(() =>
+_ = Task.Run(() =>
 {
     Thread.Sleep(10_000);
     logger.Info($"SelfKeeperEnvironment.RequestKillCurrentProcess - {SelfKeeperEnvironment.RequestKillCurrentProcess()}");

@@ -5,16 +5,18 @@ namespace SelfKeeper;
 /// <summary>
 /// 默认的控制台Logger
 /// </summary>
-public sealed class DefaultConsoleLogger : ISelfKeeperLogger
+/// <inheritdoc cref="DefaultConsoleLogger"/>
+public sealed partial class DefaultConsoleLogger(string loggerName) : ISelfKeeperLogger
 {
-    private static readonly Regex s_messageTemplateReplaceRegex = new("{.+?}", RegexOptions.CultureInvariant | RegexOptions.Compiled);
-    private readonly string _logPrefix;
+    #region Private 字段
 
-    /// <inheritdoc cref="DefaultConsoleLogger"/>
-    public DefaultConsoleLogger(string loggerName)
-    {
-        _logPrefix = $"{loggerName} [{Environment.ProcessId}] ";
-    }
+    private static readonly Regex s_messageTemplateReplaceRegex = GetMessageTemplateReplaceRegex();
+
+    private readonly string _logPrefix = $"{loggerName} [{Environment.ProcessId}] ";
+
+    #endregion Private 字段
+
+    #region Public 方法
 
     /// <inheritdoc/>
     public void Debug(string message, params object[] args)
@@ -47,6 +49,13 @@ public sealed class DefaultConsoleLogger : ISelfKeeperLogger
         Console.ResetColor();
     }
 
+    #endregion Public 方法
+
+    #region Private 方法
+
+    [GeneratedRegex("{.+?}", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
+    private static partial Regex GetMessageTemplateReplaceRegex();
+
     private string FormatMessage(string message, params object[] args)
     {
         if (message.Contains('{'))
@@ -57,4 +66,6 @@ public sealed class DefaultConsoleLogger : ISelfKeeperLogger
 
         return $"{DateTime.Now:MM-dd HH:mm:ss.fff} {_logPrefix}{message}";
     }
+
+    #endregion Private 方法
 }

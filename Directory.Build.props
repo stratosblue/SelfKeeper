@@ -1,6 +1,6 @@
 ﻿<Project>
   <PropertyGroup>
-    <TargetFrameworks>net6.0;net7.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
 
     <ImplicitUsings>enable</ImplicitUsings>
 
@@ -11,7 +11,7 @@
 
   <!--Package Info-->
   <PropertyGroup>
-    <VersionPrefix>1.1.1</VersionPrefix>
+    <VersionPrefix>1.2.0</VersionPrefix>
 
     <Description>A library that lets applications run as their own watchdog. 允许应用程序作为自己的看门狗运行的库。</Description>
 
@@ -22,6 +22,6 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>$(PackageProjectUrl)</RepositoryUrl>
 
-    <PackageTags>watchdog watch-dog</PackageTags>
+    <PackageTags>watchdog watch-dog restart auto-restart process linux posix-signal</PackageTags>
   </PropertyGroup>
 </Project>

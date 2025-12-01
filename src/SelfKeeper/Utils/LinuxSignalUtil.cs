@@ -4,9 +4,24 @@ using System.Runtime.Versioning;
 namespace SelfKeeper;
 
 [SupportedOSPlatform("linux")]
-internal static class LinuxSignalUtil
+internal static partial class LinuxSignalUtil
 {
     //SEE https://stackoverflow.com/questions/41041730/net-core-app-how-to-send-sigterm-to-child-processes
+
+    #region Public 方法
+
+    public static void KillWithSignal(int processId, PosixSignal signal)
+    {
+        var result = Kill(processId, GetSignalValue(signal));
+        if (result != 0)
+        {
+            throw new InvalidOperationException($"Kill returned value - {result}");
+        }
+    }
+
+    #endregion Public 方法
+
+    #region Private 方法
 
     private static int GetSignalValue(PosixSignal posixSignal)
     {
@@ -26,15 +41,8 @@ internal static class LinuxSignalUtil
         };
     }
 
-    [DllImport("libc", EntryPoint = "kill", SetLastError = false)]
-    private static extern int Kill(int pid, int sig);
+    [LibraryImport("libc", EntryPoint = "kill", SetLastError = false)]
+    private static partial int Kill(int pid, int sig);
 
-    public static void KillWithSignal(int processId, PosixSignal signal)
-    {
-        var result = Kill(processId, GetSignalValue(signal));
-        if (result != 0)
-        {
-            throw new InvalidOperationException($"Kill returned value - {result}");
-        }
-    }
+    #endregion Private 方法
 }

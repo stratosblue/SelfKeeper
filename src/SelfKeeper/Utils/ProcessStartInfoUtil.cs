@@ -48,7 +48,7 @@ internal static class ProcessStartInfoUtil
             var fileNameInCommandLine = Path.GetFileName(commandLineArgs[0]);
             if (fileNameInCommandLine == Path.GetFileName(fileName))
             {
-                commandLineArgs = commandLineArgs.Skip(1).ToArray();
+                commandLineArgs = [.. commandLineArgs.Skip(1)];
             }
         }
 

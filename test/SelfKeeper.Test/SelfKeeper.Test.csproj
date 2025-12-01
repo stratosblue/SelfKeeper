@@ -1,10 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="MSTest.Sdk">
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
-    <PackageReference Include="MSTest.TestAdapter" Version="2.*" />
-    <PackageReference Include="MSTest.TestFramework" Version="2.*" />
-    <PackageReference Include="coverlet.collector" Version="3.*" />
+    <AssemblyAttribute Include="Microsoft.VisualStudio.TestTools.UnitTesting.ParallelizeAttribute"/>
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\SelfKeeper\SelfKeeper.csproj" />
   </ItemGroup>

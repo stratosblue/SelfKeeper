@@ -1,8 +1,4 @@
-﻿using System.Text;
-
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SelfKeeper.Test;
+﻿namespace SelfKeeper.Test;
 
 [TestClass]
 public class KeepSelfWorkerProcessOptionsTest

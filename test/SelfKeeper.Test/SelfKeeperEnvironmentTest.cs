@@ -1,6 +1,4 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-namespace SelfKeeper.Test;
+﻿namespace SelfKeeper.Test;
 
 [TestClass]
 public class SelfKeeperEnvironmentTest
@@ -14,8 +12,8 @@ public class SelfKeeperEnvironmentTest
     [TestMethod]
     public void ThrowIfWithOutInit()
     {
-        Assert.ThrowsException<InvalidOperationException>(() => SelfKeeperEnvironment.IsWorkerProcess);
-        Assert.ThrowsException<InvalidOperationException>(() => SelfKeeperEnvironment.SessionId);
-        Assert.ThrowsException<InvalidOperationException>(() => SelfKeeperEnvironment.RequestKillCurrentProcess());
+        Assert.ThrowsExactly<InvalidOperationException>(() => SelfKeeperEnvironment.IsWorkerProcess);
+        Assert.ThrowsExactly<InvalidOperationException>(() => SelfKeeperEnvironment.SessionId);
+        Assert.ThrowsExactly<InvalidOperationException>(() => SelfKeeperEnvironment.RequestKillCurrentProcess());
     }
 }
